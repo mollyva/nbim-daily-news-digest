@@ -37,7 +37,7 @@ def fetch_topic_articles() -> list[dict]:
         params={
             "q": query,  # søkestrengen
             "language": "en",  # kun engelske artikler
-            "sortBy": "relevancy",  # mest relevante først
+            "sortBy": "publishedAt",  # nyeste først, for daily digest gir dette mest mening
             "pageSize": 20,  # maks 20 artikler
             "apiKey": NEWS_API_KEY,
             "domains": "reuters.com,bloomberg.com,ft.com,wsj.com,cnbc.com,economist.com,forbes.com,businessinsider.com,marketwatch.com,apnews.com,bbc.co.uk,theguardian.com,nytimes.com,dn.no,e24.no,finansavisen.no",
