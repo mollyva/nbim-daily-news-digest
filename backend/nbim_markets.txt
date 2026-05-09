@@ -1,0 +1,6 @@
+# NBIM Key Markets (per 31.12.2025) - Change if ratio changes
+us
+jp
+gb
+de
+fr
