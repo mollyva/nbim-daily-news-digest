@@ -23,10 +23,10 @@ def fetch_topic_articles() -> list[dict]:
     """
     Fetches articles from the /everything endpoint based on NBIM topics.
     Uses OR between the search terms so we get hits on any of them.
-    Eks: "equity markets OR ESG regulation OR geopolitics OR ..."
+    Ex: "equity markets OR ESG regulation OR geopolitics OR ..."
+    Limited to quality financial sources via domains parameter.
     """
     topics = load_topics()
-
     query = " OR ".join(topics[:5])
 
     response = requests.get(
@@ -35,7 +35,7 @@ def fetch_topic_articles() -> list[dict]:
             "q": query,  # the search query
             "language": "en",  # only english articles
             "sortBy": "publishedAt",  # newest first, for daily digest this makes most sense
-            "pageSize": 20,  # maximum 20 articles
+            "pageSize": 20,  # fetch 20 topic articles
             "apiKey": NEWS_API_KEY,
             "domains": "reuters.com,bloomberg.com,ft.com,wsj.com,cnbc.com,economist.com,forbes.com,businessinsider.com,marketwatch.com,apnews.com,bbc.co.uk,theguardian.com,nytimes.com,dn.no,e24.no,finansavisen.no",
         },
@@ -46,35 +46,38 @@ def fetch_topic_articles() -> list[dict]:
 
 def fetch_headline_articles() -> list[dict]:
     """
-    Fetches top headlines from the /top-headlines endpoint.
-    Goes through each country in nbim_markets.txt and fetches up to 5 articles per country.
-    Total maximum 25 articles (5 countries x up to 5 articles).
-    category: business is used as a rough filter — Claude does fine filtering afterwards.
+    Fetches top headlines from the /top-headlines endpoint per country from nbim_markets.txt.
+    All NBIM key markets are defined in nbim_markets.txt and can easily be updated there.
+
+    Note: NewsAPI only supports country filtering for 'us' on the /top-headlines endpoint.
+    This is a permanent API limitation, not a plan restriction.
+    We use countries[0] (us) to avoid unnecessary API calls for countries that return nothing.
+    In a production version with a news API that supports all countries, all countries in nbim_markets.txt would be used automatically.
     """
     countries = load_countries()
-    articles = []
 
-    for country in countries:
-        response = requests.get(
-            f"{BASE_URL}/top-headlines",
-            params={
-                "country": country,  # country code, for example "us" for USA, "no" for Norway
-                "category": "business",  # rough filter before Claude does fine filtering
-                "pageSize": 5,  # up to 5 articles per country
-                "apiKey": NEWS_API_KEY,
-            },
-        )
-        articles.extend(response.json().get("articles", []))
-
-    return articles
+    response = requests.get(
+        f"{BASE_URL}/top-headlines",
+        params={
+            "country": countries[
+                0
+            ],  # only 'us' supported by NewsAPI — see docstring above
+            "category": "business",  # rough filter before Claude does fine filtering
+            "pageSize": 5,  # up to 5 articles
+            "apiKey": NEWS_API_KEY,
+        },
+    )
+    return response.json().get("articles", [])
 
 
 def fetch_all_articles() -> list[dict]:
     """
     Combines articles from both endpoints and removes duplicates.
-    Returns a maximum of 20 articles total to be sent further to Claude.
+    20 topic articles + up to 5 US headline articles = up to 25 total.
     """
-    all_articles = fetch_topic_articles() + fetch_headline_articles()
+    topic_articles = fetch_topic_articles()[:20]
+    headline_articles = fetch_headline_articles()[:5]
+    all_articles = topic_articles + headline_articles
 
     # Removes duplicates by checking the URL
     # The same article might appear in both topic searches and headline searches
@@ -96,13 +99,22 @@ def fetch_all_articles() -> list[dict]:
                 }
             )
 
-    return unique[:20]
+    return unique[:25]
 
 
 # Only runs if you start the file directly with "python news_fetcher.py"
 # Not when it is imported from another file, for example from main.py
 if __name__ == "__main__":
-    articles = fetch_all_articles()
-    print(f"Fetched {len(articles)} articles")
-    for a in articles:
+    topic_articles = fetch_topic_articles()
+    headline_articles = fetch_headline_articles()
+
+    print(f"=== TOPIC ARTICLES ({len(topic_articles)}) ===")
+    for a in topic_articles:
         print(f"- {a['title']}")
+
+    print(f"\n=== HEADLINE ARTICLES ({len(headline_articles)}) ===")
+    for a in headline_articles:
+        print(f"- {a['title']}")
+
+    all_articles = fetch_all_articles()
+    print(f"\n=== TOTAL UNIQUE ARTICLES ({len(all_articles)}) ===")
