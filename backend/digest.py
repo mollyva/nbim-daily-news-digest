@@ -2,7 +2,7 @@ import anthropic
 import json
 import os
 from dotenv import load_dotenv
-from news_fetcher import fetch_all_articles, load_topics
+from backend.news_fetcher import fetch_all_articles, load_topics
 
 load_dotenv()
 
