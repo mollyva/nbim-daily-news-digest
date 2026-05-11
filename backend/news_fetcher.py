@@ -7,13 +7,13 @@ NEWS_API_KEY = os.getenv("NEWS_API_KEY")
 BASE_URL = "https://newsapi.org/v2"
 
 
-def load_topics(filepath="backend/nbim_topics.txt"):
+def load_topics(filepath="backend/config/nbim_topics.txt"):
     """Read nbim_topics.txt and return a list of topics"""
     with open(filepath, "r") as f:
         return [line.strip() for line in f if line.strip() and not line.startswith("#")]
 
 
-def load_countries(filepath="backend/nbim_markets.txt"):
+def load_countries(filepath="backend/config/nbim_markets.txt"):
     """Read nbim_markets.txt and return a list of country codes"""
     with open(filepath, "r") as f:
         return [line.strip() for line in f if line.strip() and not line.startswith("#")]
@@ -52,7 +52,8 @@ def fetch_headline_articles() -> list[dict]:
     Note: NewsAPI only supports country filtering for 'us' on the /top-headlines endpoint.
     This is a permanent API limitation, not a plan restriction.
     We use countries[0] (us) to avoid unnecessary API calls for countries that return nothing.
-    In a production version with a news API that supports all countries, all countries in nbim_markets.txt would be used automatically.
+    In a production version with a news API that supports all countries, all countries in
+    nbim_markets.txt would be used automatically.
     """
     countries = load_countries()
 
@@ -99,14 +100,13 @@ def fetch_all_articles() -> list[dict]:
                 }
             )
 
-    return unique[:25]
+    return unique[:25], topic_articles, headline_articles
 
 
 # Only runs if you start the file directly with "python news_fetcher.py"
 # Not when it is imported from another file, for example from main.py
 if __name__ == "__main__":
-    topic_articles = fetch_topic_articles()
-    headline_articles = fetch_headline_articles()
+    articles, topic_articles, headline_articles = fetch_all_articles()
 
     print(f"=== TOPIC ARTICLES ({len(topic_articles)}) ===")
     for a in topic_articles:
@@ -116,5 +116,4 @@ if __name__ == "__main__":
     for a in headline_articles:
         print(f"- {a['title']}")
 
-    all_articles = fetch_all_articles()
-    print(f"\n=== TOTAL UNIQUE ARTICLES ({len(all_articles)}) ===")
+    print(f"\n=== TOTAL UNIQUE ARTICLES ({len(articles)}) ===")
