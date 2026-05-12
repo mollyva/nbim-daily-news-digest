@@ -3,7 +3,11 @@ import json
 import os
 from dotenv import load_dotenv
 from fastapi import HTTPException
-from backend.news_fetcher import fetch_all_articles, load_topics
+
+try:
+    from backend.news_fetcher import fetch_all_articles, load_topics
+except ImportError:
+    from news_fetcher import fetch_all_articles, load_topics
 
 load_dotenv()
 
@@ -135,6 +139,9 @@ def generate_digest(mock: bool = False) -> list[dict]:
     # Defensive filter — remove articles below relevance score 3
     # Claude should already exclude these, but this is a safety net
     digest = [a for a in digest if a.get("relevance_score", 0) >= 3]
+
+    if not digest:
+        print("Warning: Claude returned no relevant articles")
 
     return digest
 

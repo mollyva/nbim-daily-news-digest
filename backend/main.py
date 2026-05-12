@@ -16,6 +16,12 @@ app.add_middleware(
 )
 
 
+@app.get("/")
+def root():
+    """Status check — confirms the API is running"""
+    return {"status": "NBIM Daily News Digest API is running"}
+
+
 @app.get("/digest")
 def get_digest(mock: bool = False):
     """
