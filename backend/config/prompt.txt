@@ -66,6 +66,7 @@ OUTPUT FORMAT:
     "author": "author name or null if unknown",
     "source": "news source",
     "published_at": "publication date",
+    "url": "article url",
     "relevance_score": "integer between 1 and 5",
     "summary": "2-3 sentences explaining what the article is about and why it matters for NBIM",
     "action": "one of the four actions defined in the action taxonomy above, using the exact casing shown",
