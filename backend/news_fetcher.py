@@ -27,7 +27,7 @@ def fetch_topic_articles() -> list[dict]:
     Limited to quality financial sources via domains parameter.
     """
     topics = load_topics()
-    query = " OR ".join(topics[:5])
+    query = " OR ".join(topics[:10])
 
     try:
         response = requests.get(

@@ -11,25 +11,30 @@ ACTION TAXONOMY:
 Use the following decision logic to assign exactly one action per article:
 
 1. Recommend public response
-   NBIM is directly named in the article, OR the article concerns a topic where NBIM has a stated public position (e.g. climate goals, ownership principles, voting behavior, ethical guidelines).
-   The comms team escalates to leadership with a recommendation to consider a public statement — they do not act themselves.
-   e.g. A newspaper reports that NBIM voted against a company's climate plan, or a politician calls on NBIM to divest from a specific country. These are illustrative examples, not an exhaustive list.
+   The article is likely to require proactive external communication from NBIM — a public statement, media outreach, or visible leadership positioning.
+   Typical triggers: direct criticism of NBIM, ethical divestment decisions attracting public attention, political scrutiny from governments or NGOs, controversies involving NBIM's ESG positions or voting behavior, or major events where journalists are likely to seek comment from NBIM specifically.
+   Direct mention of NBIM alone is NOT sufficient — the mention must be significant and central, not routine or background context.
+   e.g. Politicians publicly pressure NBIM to divest from a country, or media criticizes NBIM's transparency strategy. These are illustrative examples, not an exhaustive list.
 
 2. Alert portfolio manager
-   The article reports material developments affecting a specific company, sector, or market that is likely part of NBIM's portfolio (particularly finance, energy, technology, or industrials). No public statement needed, but the investment side must be informed.
-   e.g. A major bank NBIM likely holds announces unexpected losses, a large tech company faces a regulatory investigation, or a portfolio company is involved in an M&A deal or scandal. These are illustrative examples, not an exhaustive list.
+   The article reports a specific and material development directly affecting a named company or sector likely held in NBIM's portfolio. The development must be actionable for an investment team — e.g. unexpected earnings, M&A, scandal, regulatory action, or major restructuring.
+   Do NOT use this for: general market trends, IPO filings of companies not yet in the portfolio, broad sector analysis, or market commentary. These are illustrative examples, not an exhaustive list.
 
 3. Comms team action required
-   The article is relevant to NBIM's areas but does not require a public statement yet. The comms team needs to follow up internally — for example by preparing answers in case journalists ask, briefing the CEO, or monitoring a developing story.
+   The article is relevant to NBIM's reputation or public positioning but does not yet warrant a public statement. The comms team should prepare internally — drafting Q&A, briefing leadership, preparing talking points, or monitoring journalist interest.
+   Use this when NBIM is mentioned but not criticized, the topic may develop into a larger story, or journalists may reasonably ask NBIM for comment soon.
    e.g. A broad debate about sovereign wealth fund transparency that could generate press questions directed at NBIM. These are illustrative examples, not an exhaustive list.
 
 4. Monitor only
-   The article is tangentially relevant to NBIM's focus areas but requires no action right now. The comms team should be aware in case the situation develops.
-   e.g. A general analysis of ESG trends or equity market commentary with no direct NBIM relevance. These are illustrative examples, not an exhaustive list.
+   The article is relevant to NBIM's communications responsibilities but requires no immediate follow-up. The comms team should keep awareness in case the issue develops.
+   This category is specifically for communications monitoring — not investment action.
+   Do NOT use this when internal preparation is already warranted or journalists are likely to contact NBIM soon.
+   e.g. An early-stage political debate about sovereign wealth funds that has not yet named NBIM. These are illustrative examples, not an exhaustive list.
 
 DECISION RULES:
-- If an article directly mentions NBIM → always use "Recommend public response", regardless of topic
-- If in doubt between "Alert portfolio manager" and "Comms team action required" → ask: does this affect a specific investment? If yes, alert portfolio manager. If it affects NBIM's reputation or communications, use comms team action required.
+- If NBIM is mentioned significantly and centrally → "Recommend public response"
+- If NBIM is mentioned only briefly or as background context → "Comms team action required"
+- If in doubt between "Alert portfolio manager" and "Comms team action required" → ask: does this affect a specific investment? If yes, alert portfolio manager. If it affects NBIM's reputation, use comms team action required.
 - If in doubt between "Comms team action required" and "Monitor only" → ask: will NBIM likely need to respond to questions about this in the near future? If yes, comms team action required. If no, monitor only.
 - If in doubt about relevance → include the article with a low relevance score rather than skipping it.
 - If an article cannot be meaningfully analyzed → skip it.
@@ -61,7 +66,7 @@ OUTPUT FORMAT:
     "author": "author name or null if unknown",
     "source": "news source",
     "published_at": "publication date",
-    "relevance_score": 3,
+    "relevance_score": "integer between 1 and 5",
     "summary": "2-3 sentences explaining what the article is about and why it matters for NBIM",
     "action": "one of the four actions defined in the action taxonomy above, using the exact casing shown",
     "action_reasoning": "one sentence explaining why this action was chosen"
