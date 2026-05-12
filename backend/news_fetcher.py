@@ -29,19 +29,22 @@ def fetch_topic_articles() -> list[dict]:
     topics = load_topics()
     query = " OR ".join(topics[:5])
 
-    response = requests.get(
-        f"{BASE_URL}/everything",
-        params={
-            "q": query,  # the search query
-            "language": "en",  # only english articles
-            "sortBy": "publishedAt",  # newest first, for daily digest this makes most sense
-            "pageSize": 20,  # fetch 20 topic articles
-            "apiKey": NEWS_API_KEY,
-            "domains": "reuters.com,bloomberg.com,ft.com,wsj.com,cnbc.com,economist.com,forbes.com,businessinsider.com,marketwatch.com,apnews.com,bbc.co.uk,theguardian.com,nytimes.com,dn.no,e24.no,finansavisen.no",
-        },
-    )
-
-    return response.json().get("articles", [])
+    try:
+        response = requests.get(
+            f"{BASE_URL}/everything",
+            params={
+                "q": query,  # the search query
+                "language": "en",  # only english articles
+                "sortBy": "publishedAt",  # newest first, for daily digest this makes most sense
+                "pageSize": 20,  # fetch 20 topic articles
+                "apiKey": NEWS_API_KEY,
+                "domains": "reuters.com,bloomberg.com,ft.com,wsj.com,cnbc.com,economist.com,forbes.com,businessinsider.com,marketwatch.com,apnews.com,bbc.co.uk,theguardian.com,nytimes.com,dn.no,e24.no,finansavisen.no",
+            },
+        )
+        return response.json().get("articles", [])
+    except Exception as e:
+        print(f"Error fetching topic articles: {e}")
+        return []
 
 
 def fetch_headline_articles() -> list[dict]:
@@ -57,18 +60,22 @@ def fetch_headline_articles() -> list[dict]:
     """
     countries = load_countries()
 
-    response = requests.get(
-        f"{BASE_URL}/top-headlines",
-        params={
-            "country": countries[
-                0
-            ],  # only 'us' supported by NewsAPI — see docstring above
-            "category": "business",  # rough filter before Claude does fine filtering
-            "pageSize": 5,  # up to 5 articles
-            "apiKey": NEWS_API_KEY,
-        },
-    )
-    return response.json().get("articles", [])
+    try:
+        response = requests.get(
+            f"{BASE_URL}/top-headlines",
+            params={
+                "country": countries[
+                    0
+                ],  # only 'us' supported by NewsAPI — see docstring above
+                "category": "business",  # rough filter before Claude does fine filtering
+                "pageSize": 5,  # up to 5 articles
+                "apiKey": NEWS_API_KEY,
+            },
+        )
+        return response.json().get("articles", [])
+    except Exception as e:
+        print(f"Error fetching headline articles: {e}")
+        return []
 
 
 def fetch_all_articles() -> list[dict]:

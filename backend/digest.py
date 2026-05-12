@@ -2,6 +2,7 @@ import anthropic
 import json
 import os
 from dotenv import load_dotenv
+from fastapi import HTTPException
 from backend.news_fetcher import fetch_all_articles, load_topics
 
 load_dotenv()
@@ -101,12 +102,18 @@ def generate_digest(mock: bool = False) -> list[dict]:
     prompt = prompt.replace("{articles}", articles_str)
 
     # Send to Claude API
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-    message = client.messages.create(
-        model="claude-sonnet-4-5",
-        max_tokens=6000,
-        messages=[{"role": "user", "content": prompt}],
-    )
+    try:
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        message = client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=6000,
+            messages=[{"role": "user", "content": prompt}],
+        )
+    except Exception as e:
+        print(f"Error calling Claude API: {e}")
+        raise HTTPException(
+            status_code=500, detail="Failed to generate digest — Claude API error"
+        )
 
     # Parse JSON response
     response_text = message.content[0].text
@@ -117,7 +124,13 @@ def generate_digest(mock: bool = False) -> list[dict]:
         response_text = response_text.split("\n", 1)[1]
         response_text = response_text.rsplit("```", 1)[0]
 
-    digest = json.loads(response_text)
+    try:
+        digest = json.loads(response_text)
+    except json.JSONDecodeError as e:
+        print(f"Error parsing Claude response: {e}")
+        raise HTTPException(
+            status_code=500, detail="Failed to parse digest — invalid JSON from Claude"
+        )
 
     # Defensive filter — remove articles below relevance score 3
     # Claude should already exclude these, but this is a safety net
@@ -146,5 +159,5 @@ if __name__ == "__main__":
         print(f"Title:          {article['title']}")
         print(f"Relevance:      {article['relevance_score']}/5")
         print(f"Action:         {article['action']}")
-        print(f"Reasoning:      {article['action_reasoning']}")
+        print(f"Action reasoning: {article['action_reasoning']}")
         print("-" * 80)
